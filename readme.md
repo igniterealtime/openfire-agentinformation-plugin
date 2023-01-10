@@ -1,7 +1,7 @@
 # Openfire Agent Information Plugin
 
 This is a plugin for the Openfire Real-time Communications server. It provides an implementation for service discovery 
-using the `jabber:iq:agents` namespace, as specified in [XEP-0094: Non-SASL Authentication](https://xmpp.org/extensions/xep-0094.html).
+using the `jabber:iq:agents` namespace, as specified in [XEP-0094: Agent Information](https://xmpp.org/extensions/xep-0094.html).
 
 Note Well: The protocol implemented by this plugin has been superseded in favor of Service Discovery mechanisms as 
 specified in [XEP-0030: Service Discovery](https://xmpp.org/extensions/xep-0030.html). This plugin should not be
