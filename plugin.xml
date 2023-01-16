@@ -6,5 +6,5 @@
     <description>This plugin implements the (obsolete!) XEP-0094 'Agent Information' specification for service discovery using the jabber:iq:agents namespace.</description>
     <author>Guus der Kinderen</author>
     <version>${project.version}</version>
-    <date>2023-01-10</date>
+    <date>2023-01-16</date>
 </plugin>
