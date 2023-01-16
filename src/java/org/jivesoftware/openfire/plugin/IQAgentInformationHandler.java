@@ -150,10 +150,12 @@ public class IQAgentInformationHandler extends IQHandler implements ServerFeatur
 
         final IQ itemsResponse = XMPPServer.getInstance().getIQDiscoItemsHandler().handleIQ(itemsRequest);
         if (itemsResponse.getError() != null) {
+            Log.debug("disco#items request was responded to with an error: {}", itemsResponse.getError().toXML());
             return Collections.emptySet();
         }
         final Element childElement = itemsResponse.getChildElement();
         if (childElement == null || !"query".equals(childElement.getName()) || !IQDiscoItemsHandler.NAMESPACE_DISCO_ITEMS.equals(childElement.getNamespaceURI())) {
+            Log.debug("disco#items request was responded to using an unexpected or missing child element: {}", childElement == null ? "(null)" : childElement.asXML());
             return Collections.emptySet();
         }
 
@@ -171,14 +173,16 @@ public class IQAgentInformationHandler extends IQHandler implements ServerFeatur
 
         final IQ infoResponse = XMPPServer.getInstance().getIQDiscoInfoHandler().handleIQ(infoRequest);
         if (infoResponse.getError() != null) {
+            Log.debug("disco#info request was responded to with an error: {}", infoResponse.getError().toXML());
             return null;
         }
 
         final Element childElement = infoResponse.getChildElement();
         if (childElement == null || !"query".equals(childElement.getName()) || !IQDiscoInfoHandler.NAMESPACE_DISCO_INFO.equals(childElement.getNamespaceURI())) {
+            Log.debug("disco#info request was responded to using an unexpected or missing child element: {}", childElement == null ? "(null)" : childElement.asXML());
             return null;
         }
-        return infoResponse.getChildElement();
+        return childElement;
     }
 
     public static boolean isCategory(final Element discoInfoElement, final String categoryName)
@@ -187,12 +191,15 @@ public class IQAgentInformationHandler extends IQHandler implements ServerFeatur
             return false;
         }
 
+        boolean result = false;
         for (final Element identityElement : discoInfoElement.elements("identity")) {
             if (categoryName.equals(identityElement.attributeValue("category"))) {
-                return true;
+                result = true;
+                break;
             }
         }
-        return false;
+        Log.trace("Disco#info {} define an identify of category {}", result ? "does" : "doesn't", categoryName);
+        return result;
     }
 
     public static boolean supportsFeature(final Element discoInfoElement, final String featureName)
@@ -201,12 +208,15 @@ public class IQAgentInformationHandler extends IQHandler implements ServerFeatur
             return false;
         }
 
+        boolean result = false;
         for (final Element identityElement : discoInfoElement.elements("feature")) {
             if (featureName.equals(identityElement.attributeValue("var"))) {
-                return true;
+                result = true;
+                break;
             }
         }
-        return false;
+        Log.trace("Disco#info {} define feature {}", result ? "does" : "doesn't", featureName);
+        return result;
     }
 
 
@@ -218,10 +228,13 @@ public class IQAgentInformationHandler extends IQHandler implements ServerFeatur
 
         for (final Element identityElement : discoInfoElement.elements("identity")) {
             if ("gateway".equals(identityElement.attributeValue("category"))) {
-                return identityElement.attributeValue("type");
+                final String result = identityElement.attributeValue("type");
+                Log.trace("Disco#info defines a transport of type {}", result);
+                return result;
             }
         }
 
+        Log.trace("Disco#info does not define a transport.");
         return null;
     }
 
@@ -231,15 +244,18 @@ public class IQAgentInformationHandler extends IQHandler implements ServerFeatur
             return false;
         }
 
+        boolean result = false;
         for (final Element identityElement : discoInfoElement.elements("identity")) {
             if ("directory".equals(identityElement.attributeValue("category"))) {
                 if ("user".equals(identityElement.attributeValue("type"))) {
-                    return true;
+                    result = true;
+                    break;
                 }
             }
         }
 
-        return false;
+        Log.trace("Disco#info {} define a user directory", result ? "does" : "doesn't");
+        return result;
     }
 
     /**
